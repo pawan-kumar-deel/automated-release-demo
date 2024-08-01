@@ -1,0 +1,68 @@
+name: Auto Create Release Branch
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # To push a branch
+      pull-requests: write  # To create a PR from that branch
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Get latest tag on master and check for existing release branch
+        id: setup
+        run: |
+          git fetch --tags
+          latest_tag=''
+          release_branch=release/${{ env.date }}
+          echo $release_branch
+          if git show-ref refs/remotes/origin/$release_branch; then
+            echo "exists"
+            echo "release-branch=exists" >> $GITHUB_ENV
+          else
+            echo "not exist"
+            echo "release-branch=none" >> $GITHUB_ENV
+          fi
+          echo "latest-tag=$latest_tag" >> $GITHUB_ENV
+          echo "release-branch-name=$release_branch" >> $GITHUB_ENV
+
+      - name: Create release branch if none exists and push
+        if: env.release-branch == 'none'
+        run: |
+          git checkout -b ${{ env.release-branch-name }} origin/dev
+          git push origin ${{ env.release-branch-name }}
+          changes="`git log origin/master..${{ env.release-branch-name }} --oneline`"         
+          echo "changes=$changes" >> $GITHUB_ENV
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel' --body '
+          # Release Changes
+          
+          Changes since last tag ${{ env.latest-tag }}:
+          
+          **Changes:**
+          `$changes`
+          
+          [View changes][1]
+          
+          [1]: https://github.com/pawan-kumar-deel/automated-release-demo/compare/master...${{ env.release-branch-name }}
+          '
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output
+        run: |
+          if [ "${{ env.release-branch }}" = "exists" ]; then
+            echo "A release branch already exists."
+          fi
