@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get the latest commit message
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
@@ -18,7 +18,7 @@ jobs:
       - name: Extract release branch name from commit message
         id: extract_branch_name
         run: |
-          if [[ "${{ env.COMMIT_MESSAGE }}" =~ merge\ branch\ 'release/([^']+) ]]; then
+          if [[ "${{ env.COMMIT_MESSAGE }}" =~ Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/release/([^\ ]+) ]]; then
             echo "RELEASE_BRANCH=${BASH_REMATCH[1]}" >> $GITHUB_ENV
           else
             echo "RELEASE_BRANCH=unknown" >> $GITHUB_ENV
@@ -28,18 +28,18 @@ jobs:
         id: get_tags
         run: |
           TAG_PREFIX="${{ env.RELEASE_BRANCH }}"
+          if [ "$TAG_PREFIX" == "unknown" ]; then
+            echo "No valid release branch name found in commit message. Exiting."
+            exit 1
+          fi
           TAGS=$(git tag -l "${TAG_PREFIX}*")
-          echo "TAGS=${TAGS}" >> $GITHUB_ENV
+          echo "TAGS=$TAGS" >> $GITHUB_ENV
 
       - name: Determine new tag
         id: determine_tag
         run: |
           TAG_PREFIX="${{ env.RELEASE_BRANCH }}"
           TAGS="${{ env.TAGS }}"
-          if [ -z "$TAG_PREFIX" ]; then
-            echo "No release branch name found in commit message. Exiting."
-            exit 1
-          fi
           if [ -z "$TAGS" ]; then
             NEW_TAG="$TAG_PREFIX"
           else
@@ -57,7 +57,7 @@ jobs:
               exit 1
             fi
           fi
-          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       - name: Create tag
         uses: actions/github-script@v5
