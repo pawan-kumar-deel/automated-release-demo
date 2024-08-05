@@ -44,20 +44,15 @@ jobs:
         run: |
           git checkout -b ${{ env.release-branch-name }} origin/dev
           git push origin ${{ env.release-branch-name }}
-          changes="`git log origin/master..${{ env.release-branch-name }} --oneline`"         
-          echo "changes=$changes" >> $GITHUB_ENV
-          gh pr create -d -B master -H ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel' --body '
-          # Release Changes
-          
-          Changes since last tag ${{ env.latest-tag }}:
-          
-          **Changes:**
-          `$changes`
-          
-          [View changes][1]
-          
-          [1]: https://github.com/pawan-kumar-deel/automated-release-demo/compare/master...${{ env.release-branch-name }}
-          '
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update the release branch if branch already exists
+        if: env.release-branch == 'exists'
+        run: |
+          git merge origin/dev
+          git push origin ${{ env.release-branch-name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
