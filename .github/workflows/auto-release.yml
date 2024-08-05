@@ -46,7 +46,7 @@ jobs:
           git push origin ${{ env.release-branch-name }}
           changes="`git log origin/master..${{ env.release-branch-name }} --oneline`"         
           echo "changes=$changes" >> $GITHUB_ENV
-          gh pr create -d -B master -H ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel' --body '
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel' --body '
           # Release Changes
           
           Changes since last tag ${{ env.latest-tag }}:
