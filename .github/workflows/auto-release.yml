@@ -12,6 +12,8 @@ jobs:
     permissions:
       contents: write  # To push a branch
       pull-requests: write  # To create a PR from that branch
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,7 +52,7 @@ jobs:
           git checkout -b ${{ env.release-branch-name }} origin/dev
           git push origin ${{ env.release-branch-name }}
           git log origin/master..${{ env.release-branch-name }} --oneline >> changes.txt
-          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel'
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,8 +67,6 @@ jobs:
           git push origin ${{ env.release-branch-name }}
           git log origin/master..origin/${{ env.release-branch-name }} --oneline >> changes.txt
           gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Output
         run: |
