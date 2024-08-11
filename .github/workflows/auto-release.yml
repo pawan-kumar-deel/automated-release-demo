@@ -51,8 +51,10 @@ jobs:
         run: |
           git checkout -b ${{ env.release-branch-name }} origin/dev
           git push origin ${{ env.release-branch-name }}
+          echo "# Automated release ${{ env.date }}" > changes.txt
+          echo "### Changes since last release:" >> changes.txt
           git log origin/master..${{ env.release-branch-name }} --oneline >> changes.txt
-          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release'
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -l 'Release' -F changes.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,6 +67,8 @@ jobs:
           git pull
           git merge dev
           git push origin ${{ env.release-branch-name }}
+          echo "# Automated release ${{ env.date }}" > changes.txt
+          echo "### Changes since last release:" >> changes.txt
           git log origin/master..${{ env.release-branch-name }} --oneline >> changes.txt
           gh pr edit ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -F changes.txt
 
