@@ -55,8 +55,10 @@ jobs:
           git fetch origin dev
           git fetch origin master
           git fetch origin ${{ env.release-branch-name }}
+          git checkout dev
+          git pull origin dev
           git checkout ${{ env.release-branch-name }}
-          git merge origin/dev 
+          git merge dev 
           git push origin ${{ env.release-branch-name }}
           git log origin/master..origin/${{ env.release-branch-name }} --oneline >> changes.txt
           gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]'
