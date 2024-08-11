@@ -66,7 +66,7 @@ jobs:
           git merge dev
           git push origin ${{ env.release-branch-name }}
           git log origin/master..${{ env.release-branch-name }} --oneline >> changes.txt
-          gh pr edit ${{ env.release-branch-name }} --title 'Release [${{env.date}}]'
+          gh pr edit ${{ env.release-branch-name }} --title 'Release [${{env.date}}]' -F changes.txt
 
       - name: Output
         run: |
