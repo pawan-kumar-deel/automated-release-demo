@@ -1,0 +1,10 @@
+5c89d08 use origin
+6f3d7e4 use fetch
+ed5c547 Update test.txg
+5565962 test rebase=true
+62e855f Update test.txg
+624a676 test autorelease
+0b53ec7 test autorelease
+d12c671 test autorelease
+52b8da4 test autorelease
+52ad132 Create auto-tag.yaml
