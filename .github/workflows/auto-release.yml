@@ -45,23 +45,19 @@ jobs:
           git checkout -b ${{ env.release-branch-name }} origin/dev
           git push origin ${{ env.release-branch-name }}
           git log origin/master..${{ env.release-branch-name }} --oneline >> changes.txt
-          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel' --fill-verbose
+          gh pr create -d -B master -H ${{ env.release-branch-name }} --fill-verbose --title 'Release [${{env.date}}]' -l 'Release' -r 'pawan-kumar-deel'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update the release branch if branch already exists
         if: env.release-branch == 'exists'
         run: |
-          git fetch origin dev
-          git fetch origin master
-          git fetch origin ${{ env.release-branch-name }}
-          git checkout dev
-          git pull origin dev
           git checkout ${{ env.release-branch-name }}
-          git merge dev 
+          git pull origin dev
+          git merge origin/dev
           git push origin ${{ env.release-branch-name }}
           git log origin/master..origin/${{ env.release-branch-name }} --oneline >> changes.txt
-          gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]'
+          gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]' --fill-verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
