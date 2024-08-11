@@ -52,6 +52,7 @@ jobs:
       - name: Update the release branch if branch already exists
         if: env.release-branch == 'exists'
         run: |
+          git config pull.ff only
           git pull origin dev
           git pull origin master
           git pull origin ${{ env.release-branch-name }}
