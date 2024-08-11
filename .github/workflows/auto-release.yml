@@ -58,10 +58,7 @@ jobs:
         if: env.release-branch == 'exists'
         run: |
           git config pull.rebase false
-          git checkout dev
-          git pull
-          git checkout master
-          git pull
+          git fetch origin ${{ env.release-branch-name }}
           git checkout ${{ env.release-branch-name }}
           git pull
           git merge dev
