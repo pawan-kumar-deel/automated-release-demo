@@ -1,6 +1,9 @@
 name: Auto Create Release Branch
 
 on:
+  push:
+    branches:
+      - dev
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -53,9 +56,13 @@ jobs:
         if: env.release-branch == 'exists'
         run: |
           git config pull.rebase false
+          git checkout dev
+          git pull
+          git checkout master
+          git pull
           git checkout ${{ env.release-branch-name }}
-          git pull origin dev
-          git merge origin/dev
+          git pull
+          git merge dev
           git push origin ${{ env.release-branch-name }}
           git log origin/master..origin/${{ env.release-branch-name }} --oneline >> changes.txt
           gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]' --fill-verbose
