@@ -52,12 +52,11 @@ jobs:
       - name: Update the release branch if branch already exists
         if: env.release-branch == 'exists'
         run: |
-          git config pull.rebase true
-          git pull origin dev
-          git pull origin master
-          git pull origin ${{ env.release-branch-name }}
+          git fetch origin dev
+          git fetch origin master
+          git fetch origin ${{ env.release-branch-name }}
           git checkout ${{ env.release-branch-name }}
-          git merge dev 
+          git merge origin/dev 
           git push origin ${{ env.release-branch-name }}
           git log origin/master..origin/${{ env.release-branch-name }} --oneline >> changes.txt
           gh pr edit {{ env.release-branch-name }} --title 'Release [${{env.date}}]' --body $changes
